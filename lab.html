@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab Work Upload - Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* green accent for lab */
+    .submit-btn.lab-btn {
+      background: linear-gradient(135deg, #48bb78, #38a169);
+      box-shadow: 0 4px 15px rgba(72,187,120,0.35);
+    }
+    .submit-btn.lab-btn:hover { box-shadow: 0 6px 20px rgba(72,187,120,0.5); }
+    .counter-badge.lab  { background: #48bb78; }
+    .sub-item.lab-item  { border-left-color: #48bb78; }
+    .sub-badge.lab-badge{ background: #c6f6d5; color: #276749; }
+  </style>
+</head>
+<body>
+
+  <nav class="menu">
+    <a href="index.html">🏠 Home</a>
+    <a href="dashboard.html">📊 Dashboard</a>
+    <a href="quiz.html">📝 Quiz</a>
+    <a href="lab.html" class="active">🧪 Lab Work</a>
+    <a href="exam.html">📋 Exam</a>
+  </nav>
+
+  <div class="page-title">
+    <h1>🧪 Lab Work Upload</h1>
+    <p>Submit your lab exercises and proof of work</p>
+  </div>
+
+  <div class="upload-wrapper">
+
+    <div class="upload-card">
+      <h2>New Lab Submission <span class="counter-badge lab" id="labCounter">0</span></h2>
+
+      <div class="toast success" id="successToast"></div>
+      <div class="toast error"   id="errorToast"></div>
+
+      <div class="form-group">
+        <label>Lab Title / Description</label>
+        <textarea id="labTitle" rows="3" maxlength="300"
+          placeholder="e.g. Lab #2 – CSS Styling Exercise&#10;Describe what this lab covers..."
+          oninput="document.getElementById('charCount').textContent = this.value.length"></textarea>
+        <div class="char-count"><span id="charCount">0</span> / 300</div>
+      </div>
+
+      <div class="form-group">
+        <label>Proof Image </label>
+        <div class="file-drop">
+          <input type="file" id="labProof" accept="image/*"
+                 onchange="previewProof('labProof','labProofImg','labProofWrap','labProofLabel')">
+          <span class="drop-icon">🖼️</span>
+          <span class="drop-label">Click or drag &amp; drop proof image<br>
+            <small>jpg &nbsp;·&nbsp; png &nbsp;·&nbsp; webp</small>
+          </span>
+          <div class="file-chosen" id="labProofLabel"></div>
+        </div>
+        <div class="proof-preview" id="labProofWrap">
+          <img id="labProofImg" src="" alt="Proof preview">
+        </div>
+      </div>
+
+      <button class="submit-btn lab-btn" onclick="uploadLab()">📤 Submit Lab Work</button>
+    </div>
+
+    <div class="history-card">
+      <h2>🗂️ Submitted Lab Works</h2>
+      <div id="labHistory">
+        <div class="pic-subtitle">lab 1</div>
+          <img src="lab1.jpg" width="200" height="200" alt="Justin Arge B. Enecillo" id="lab1.jpg">
+        </div>
+        <div class="pic-subtitle">lab 2</div>
+         <img src="lab1.jpg" width="200" height="200" alt="Justin Arge B. Enecillo" id="lab1.jpg">
+        <div class="empty-note" id="emptyNote">2 lab work submitted.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // =============================================
+    // LAB UPLOAD JAVASCRIPT
+    // =============================================
+
+    // Sample 4: Counter
+    let labCount = parseInt(localStorage.getItem('portfolio_labCount') || '0');
+    let submissions = JSON.parse(localStorage.getItem('portfolio_labItems') || '[]');
+    document.getElementById('labCounter').textContent = labCount;
+    renderHistory();
+
+    // Sample 3: Change Text
+    function showFileName(inputId, labelId) {
+      let file = document.getElementById(inputId).files[0];
+      if (file) {
+        document.getElementById(labelId).textContent = '📎 ' + file.name;
+        console.log('Sample 3: File selected —', file.name);
+      }
+    }
+
+    function previewProof(inputId, imgId, wrapId, labelId) {
+      let file = document.getElementById(inputId).files[0];
+      if (!file) return;
+      document.getElementById(labelId).textContent = '📎 ' + file.name;
+      let reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById(imgId).src = e.target.result;
+        document.getElementById(wrapId).style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Sample 1 + 6: Alert + If Validation
+    function uploadLab() {
+      let title = document.getElementById('labTitle').value.trim();
+      let file  = document.getElementById('labFile').files[0];
+      let proof = document.getElementById('labProof').files[0];
+
+      // Sample 6: If-else
+      if (!title) { showToast('error', '❌ Please enter a lab title or description.'); return; }
+      if (!file)  { showToast('error', '❌ Please upload the lab file.'); return; }
+      if (!proof) { showToast('error', '❌ Proof image is required.'); return; }
+
+      // Sample 4: increment
+      labCount++;
+      localStorage.setItem('portfolio_labCount', labCount);
+      document.getElementById('labCounter').textContent = labCount;
+
+      let shortTitle = title.length > 60 ? title.substring(0, 60) + '...' : title;
+      let item = { title: shortTitle, file: file.name, date: new Date().toLocaleDateString() };
+      submissions.push(item);
+      localStorage.setItem('portfolio_labItems', JSON.stringify(submissions));
+
+      showToast('success', '✅ Lab submitted! Total: ' + labCount);
+      resetForm();
+      renderHistory();
+      console.log('Sample 1+4+6: Lab uploaded —', shortTitle);
+    }
+
+    // Sample 9: Loop
+    function renderHistory() {
+      let list = document.getElementById('labHistory');
+      document.getElementById('emptyNote').style.display = submissions.length === 0 ? 'block' : 'none';
+      document.querySelectorAll('.sub-item').forEach(function (el) { el.remove(); });
+
+      for (let i = 0; i < submissions.length; i++) {
+        let s = submissions[i];
+        let item = document.createElement('div');
+        item.className = 'sub-item lab-item';
+        item.innerHTML =
+          '<div>' +
+            '<div class="sub-title">' + s.title + '</div>' +
+            '<div class="sub-meta">📎 ' + s.file + ' &nbsp;·&nbsp; 🗓 ' + s.date + '</div>' +
+          '</div>' +
+          '<span class="sub-badge lab-badge">Submitted</span>';
+        list.appendChild(item);
+      }
+    }
+
+    function showToast(type, msg) {
+      let el = document.getElementById(type === 'success' ? 'successToast' : 'errorToast');
+      el.textContent = msg;
+      el.style.display = 'block';
+      setTimeout(function () { el.style.display = 'none'; }, 4000);
+    }
+
+    function resetForm() {
+      document.getElementById('labTitle').value = '';
+      document.getElementById('labFile').value  = '';
+      document.getElementById('labProof').value = '';
+      document.getElementById('labFileLabel').textContent  = '';
+      document.getElementById('labProofLabel').textContent = '';
+      document.getElementById('labProofWrap').style.display = 'none';
+      document.getElementById('charCount').textContent = '0';
+    }
+
+    document.querySelectorAll('.file-drop').forEach(function (drop) {
+      drop.addEventListener('dragover',  function (e) { e.preventDefault(); drop.classList.add('drag-over'); });
+      drop.addEventListener('dragleave', function ()  { drop.classList.remove('drag-over'); });
+      drop.addEventListener('drop',      function ()  { drop.classList.remove('drag-over'); });
+    });
+
+    console.log('🧪 Lab Upload Loaded!');
+  </script>
+
+</body>
+</html>

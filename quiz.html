@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Upload - Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+   <style>
+    .square-pic img {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid white;
+} </style>
+
+  <nav class="menu">
+    <a href="index.html">🏠 Home</a>
+    <a href="dashboard.html">📊 Dashboard</a>
+    <a href="quiz.html" class="active">📝 Quiz</a>
+    <a href="lab.html">🧪 Lab Work</a>
+    <a href="exam.html">📋 Exam</a>
+  </nav>
+
+  <div class="page-title">
+    <h1>📝 Quiz Upload</h1>
+    <p>Submit your quiz files and proof of completion</p>
+  </div>
+
+  <div class="upload-wrapper">
+
+    <!-- Upload Form -->
+    <div class="upload-card">
+      <h2>New Quiz Submission <span class="counter-badge" id="quizCounter">0</span></h2>
+
+      <div class="toast success" id="successToast"></div>
+      <div class="toast error"   id="errorToast"></div>
+
+      <!-- Sample 5: Input Field -->
+      <div class="form-group">
+        <label>Quiz Title</label>
+        <input type="text" id="quizTitle" placeholder="e.g. Quiz #1 – HTML Basics">
+      </div>
+
+      <div class="form-group">
+        <label>Proof Image <span class="required-badge">required</span></label>
+        <div class="file-drop" id="quizProofDrop">
+          <input type="file" id="quizProof" accept="image/*"
+                 onchange="previewProof('quizProof','quizProofImg','quizProofWrap','quizProofLabel')">
+          <span class="drop-icon">🖼️</span>
+          <span class="drop-label">Click or drag &amp; drop proof image<br>
+            <small>jpg &nbsp;·&nbsp; png &nbsp;·&nbsp; webp</small>
+          </span>
+          <div class="file-chosen" id="quizProofLabel"></div>
+        </div>
+        <div class="proof-preview" id="quizProofWrap">
+          <img id="quizProofImg" src="" alt="Proof preview">
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="uploadQuiz()">📤 Submit Quiz</button>
+    </div>
+
+    <!-- History -->
+    <div class="history-card">
+      <h2>📋 Submitted Quizzes</h2>
+      <div id="quizHistory">
+         <div class="quiz1">
+          <div class="pic-subtitle">quiz 1</div>
+          <img src="quiz1.jpg" width="200" height="200" alt="Justin Arge B. Enecillo" id="quiz1.jpg">
+        </div>
+        <div class="pic-subtitle">quiz 2</div>
+          <img src="quiz2.jpg" width="200" height="200" alt="Justin Arge B. Enecillo" id="quiz2.jpg">
+        </div>
+          </div>
+        <div class="pic-subtitle">quiz 3</div>
+          <img src="quiz3.jpg" width="200" height="200" alt="Justin Arge B. Enecillo" id="quiz3.jpg">
+        </div>
+         <div class="pic-subtitle">long quiz</div>
+          <img src="long quiz.jpg" width="200" height="200" alt="Justin Arge B. Enecillo" id="long quiz.jpg">
+        </div>
+        <div class="pic-subtitle">quiz 1 finals</div>
+          <img src="final 1.jpg" width="200" height="200" alt="Justin Arge B. Enecillo" id="final 1.jpg">
+        </div>
+        <div class="pic-subtitle">quiz 2 finals</div>
+          <img src="final 2.jpg" width="200" height="200" alt="Justin Arge B. Enecillo" id="final 2.jpg">
+        </div>
+        <div class="pic-subtitle">long quiz 2 finals</div>
+          <img src="long quiz 2.jpg" width="200" height="200" alt="Justin Arge B. Enecillo" id="long quiz 2.jpg">
+        </div>
+        <div class="empty-note" id="emptyNote">7 quizzes submitted.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // =============================================
+    // QUIZ UPLOAD JAVASCRIPT
+    // =============================================
+
+    // Sample 4: Counter
+    let quizCount = parseInt(localStorage.getItem('portfolio_quizCount') || '0');
+    let submissions = JSON.parse(localStorage.getItem('portfolio_quizItems') || '[]');
+    document.getElementById('quizCounter').textContent = quizCount;
+    renderHistory();
+
+    function previewProof(inputId, imgId, wrapId, labelId) {
+      let file = document.getElementById(inputId).files[0];
+      if (!file) return;
+      document.getElementById(labelId).textContent = '📎 ' + file.name;
+      let reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById(imgId).src = e.target.result;
+        document.getElementById(wrapId).style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Sample 1 + 6: Alert + If Validation
+    function uploadQuiz() {
+      let title = document.getElementById('quizTitle').value.trim();
+      let file  = document.getElementById('quizFile').files[0];
+      let proof = document.getElementById('quizProof').files[0];
+
+      // Sample 6: If-else validation
+      if (!title) { showToast('error', '❌ Please enter a quiz title.'); return; }
+      if (!proof) { showToast('error', '❌ Proof image is required.'); return; }
+
+      // Sample 4: increment counter
+      quizCount++;
+      localStorage.setItem('portfolio_quizCount', quizCount);
+      document.getElementById('quizCounter').textContent = quizCount;
+
+      let item = { title: title, file: file.name, date: new Date().toLocaleDateString() };
+      submissions.push(item);
+      localStorage.setItem('portfolio_quizItems', JSON.stringify(submissions));
+
+      showToast('success', '✅ "' + title + '" submitted! Total: ' + quizCount);
+      resetForm();
+      renderHistory();
+      console.log('Sample 1+4+6: Quiz uploaded —', title);
+    }
+
+    // Sample 9: Loop — render list
+    function renderHistory() {
+      let list = document.getElementById('quizHistory');
+      document.getElementById('emptyNote').style.display = submissions.length === 0 ? 'block' : 'none';
+      document.querySelectorAll('.sub-item').forEach(function (el) { el.remove(); });
+
+      for (let i = 0; i < submissions.length; i++) {
+        let s = submissions[i];
+        let item = document.createElement('div');
+        item.className = 'sub-item';
+        item.innerHTML =
+          '<div>' +
+            '<div class="sub-title">' + s.title + '</div>' +
+            '<div class="sub-meta">📎 ' + s.file + ' &nbsp;·&nbsp; 🗓 ' + s.date + '</div>' +
+          '</div>' +
+          '<span class="sub-badge">Submitted</span>';
+        list.appendChild(item);
+      }
+      console.log('Sample 9: Rendered', submissions.length, 'quiz submissions');
+    }
+
+    function showToast(type, msg) {
+      let el = document.getElementById(type === 'success' ? 'successToast' : 'errorToast');
+      el.textContent = msg;
+      el.style.display = 'block';
+      setTimeout(function () { el.style.display = 'none'; }, 4000);
+    }
+
+    function resetForm() {
+      document.getElementById('quizTitle').value = '';
+      document.getElementById('quizProof').value = '';
+      document.getElementById('quizProofLabel').textContent = '';
+      document.getElementById('quizProofWrap').style.display = 'none';
+    }
+
+    // Drag & drop visual
+    document.querySelectorAll('.file-drop').forEach(function (drop) {
+      drop.addEventListener('dragover',  function (e) { e.preventDefault(); drop.classList.add('drag-over'); });
+      drop.addEventListener('dragleave', function ()  { drop.classList.remove('drag-over'); });
+      drop.addEventListener('drop',      function ()  { drop.classList.remove('drag-over'); });
+    });
+
+    console.log('📝 Quiz Upload Loaded!');
+  </script>
+
+</body>
+</html>

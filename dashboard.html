@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav class="menu">
+    <a href="index.html">🏠 Home</a>
+    <a href="dashboard.html" class="active">📊 Dashboard</a>
+    <a href="quiz.html">📝 Quiz</a>
+    <a href="lab.html">🧪 Lab Work</a>
+    <a href="exam.html">📋 Exam</a>
+  </nav>
+
+  <div class="dashboard">
+    <h1>📊 My Dashboard</h1>
+
+    <!-- Sample 5: Input Search -->
+    <input type="text" id="searchInput" placeholder="🔍 Search files, subjects..." oninput="searchFiles()">
+<div class="pic-subtitle">quiz 7, lab 2, exam 1</div>
+   
+
+    <!-- Summary -->
+    <div class="summary">
+      <p><strong>Total Submissions:</strong> <span id="totalFiles">10</span></p>
+      <p><strong>Average Grade:</strong> <span id="avgGrade">P</span></p>
+      <p><strong>Highest Score:</strong> <span id="highScore">39</span></p>
+      <p><strong>Letter Grade:</strong> <span id="letterGrade">A+</span></p>
+    </div>
+
+    <button class="calc-btn" onclick="calculateAverage()">🔢 Recalculate Average</button>
+  </div>
+
+  <script>
+    // =============================================
+    // DASHBOARD JAVASCRIPT
+    // =============================================
+
+    // Sample 9: Loop — load counts from localStorage
+    let keys = ['quiz', 'lab', 'exam'];
+    let total = 0;
+    for (let i = 0; i < keys.length; i++) {
+      let val = parseInt(localStorage.getItem('portfolio_' + keys[i] + 'Count') || '0');
+      document.getElementById(keys[i] + 'Count').textContent = val;
+      total += val;
+    }
+    document.getElementById('totalFiles').textContent = total;
+
+    // Sample 6 + 9 + 10: Loop + If + Grade Checker
+    function calculateAverage() {
+      let scores = [95, 88, 92, 78, 96, 85];
+      let sum = 0;
+
+      // Sample 9: for loop
+      for (let i = 0; i < scores.length; i++) {
+        sum += scores[i];
+      }
+
+      let average = Math.round(sum / scores.length);
+      let highest = Math.max.apply(null, scores);
+
+      // Sample 6: If-else grade checker
+      let grade;
+      if      (average >= 90) grade = 'A';
+      else if (average >= 80) grade = 'B';
+      else if (average >= 70) grade = 'C';
+      else if (average >= 60) grade = 'D';
+      else                    grade = 'F';
+
+      // Sample 3: Change Text
+      document.getElementById('avgGrade').textContent   = average + '%';
+      document.getElementById('highScore').textContent  = highest + '%';
+      document.getElementById('letterGrade').textContent = grade;
+
+      alert('📊 Average: ' + average + '% | Grade: ' + grade + ' | Highest: ' + highest + '%');
+      console.log('Sample 6+9+10: Average =', average, '| Grade =', grade);
+    }
+
+    // Sample 5: Input — Search
+    function searchFiles() {
+      let term = document.getElementById('searchInput').value.trim();
+
+      // Sample 6: If
+      if (term.length >= 2) {
+        let items = ['Quiz #1', 'Quiz #2', 'Quiz #3', 'Lab #1', 'Lab #2', 'Midterm Exam'];
+        let found = [];
+
+        // Sample 9: Loop + filter
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].toLowerCase().indexOf(term.toLowerCase()) !== -1) {
+            found.push(items[i]);
+          }
+        }
+
+        let msg = found.length > 0
+          ? '🔍 Found: ' + found.join(', ')
+          : '❌ No matches for "' + term + '"';
+        console.log('Sample 5: Search —', term, '|', msg);
+      }
+    }
+
+    // Auto-calculate on load
+    calculateAverage();
+    console.log('📊 Dashboard Loaded!');
+  </script>
+
+</body>
+</html>

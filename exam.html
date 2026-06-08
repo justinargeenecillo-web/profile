@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Major Exam Upload - Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .submit-btn.exam-btn {
+      background: linear-gradient(135deg, #f6ad55, #c05621);
+      box-shadow: 0 4px 15px rgba(237,137,54,0.35);
+    }
+    .submit-btn.exam-btn:hover { box-shadow: 0 6px 20px rgba(237,137,54,0.5); }
+    .counter-badge.exam  { background: #ed8936; }
+    .sub-item.exam-item  { border-left-color: #ed8936; }
+    .sub-badge.exam-badge{ background: #feebc8; color: #7b341e; }
+  </style>
+</head>
+<body>
+
+  <nav class="menu">
+    <a href="index.html">🏠 Home</a>
+    <a href="dashboard.html">📊 Dashboard</a>
+    <a href="quiz.html">📝 Quiz</a>
+    <a href="lab.html">🧪 Lab Work</a>
+    <a href="exam.html" class="active">📋 Exam</a>
+  </nav>
+
+  <div class="page-title">
+    <h1>📋 Major Exam Upload</h1>
+    <p>Submit your major exam files and proof of completion</p>
+  </div>
+
+  <div class="upload-wrapper">
+
+    <div class="upload-card">
+      <h2>New Exam Submission <span class="counter-badge exam" id="examCounter">0</span></h2>
+
+      <div class="toast success" id="successToast"></div>
+      <div class="toast error"   id="errorToast"></div>
+
+      <!-- Title -->
+      <div class="form-group">
+        <label>Exam Title</label>
+        <input type="text" id="examTitle" placeholder="e.g. Midterm Exam – Web Development">
+      </div>
+
+      <!-- Exam Type — Sample 8: Toggle selection -->
+      <div class="form-group">
+        <label>Exam Type</label>
+        <div class="type-row">
+          <div class="type-btn" onclick="selectType(this, 'Midterm')">📗 Midterm</div>
+          <div class="type-btn" onclick="selectType(this, 'Final')">📙 Final</div>
+        </div>
+      </div>
+
+      <!-- Score + Live Grade — Sample 7: Multiple parameters -->
+      <div class="form-group">
+        <label>Score (0 – 100)</label>
+        <div class="score-grid">
+          <input type="number" id="examScore" placeholder="e.g. 95" min="0" max="100" oninput="updateGrade()">
+          <div class="grade-box" id="gradeBox">
+            <div class="grade-letter" id="gradeLetter">–</div>
+            <div class="grade-word">Grade</div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Proof Image -->
+      <div class="form-group">
+        <label>Proof Image <span class="required-badge">required</span></label>
+        <div class="file-drop">
+          <input type="file" id="examProof" accept="image/*"
+                 onchange="previewProof('examProof','examProofImg','examProofWrap','examProofLabel')">
+          <span class="drop-icon">🖼️</span>
+          <span class="drop-label">Click or drag &amp; drop proof image<br>
+            <small>jpg &nbsp;·&nbsp; png &nbsp;·&nbsp; webp</small>
+          </span>
+          <div class="file-chosen" id="examProofLabel"></div>
+        </div>
+        <div class="proof-preview" id="examProofWrap">
+          <img id="examProofImg" src="" alt="Proof preview">
+        </div>
+      </div>
+
+      <button class="submit-btn exam-btn" onclick="uploadExam()">📤 Submit Exam</button>
+    </div>
+
+    <div class="history-card">
+      <h2>📋 Submitted Exams</h2>
+      <div id="examHistory">
+        <div class="pic-subtitle">midterm</div>
+          <img src="midterm-itec.jpg" width="200" height="200" alt="Justin Arge B. Enecillo" id="midterm-itec.jpg">
+        </div>
+        <div class="empty-note" id="emptyNote">1 exams submitted yet.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // =============================================
+    // EXAM UPLOAD JAVASCRIPT
+    // =============================================
+
+    // Sample 4: Counter
+    let examCount = parseInt(localStorage.getItem('portfolio_examCount') || '0');
+    let submissions = JSON.parse(localStorage.getItem('portfolio_examItems') || '[]');
+    let selectedType = 'Prelim';
+    document.getElementById('examCounter').textContent = examCount;
+    renderHistory();
+
+    // Sample 8: Toggle — Exam type selector
+    function selectType(el, type) {
+      document.querySelectorAll('.type-btn').forEach(function (b) { b.classList.remove('selected'); });
+      el.classList.add('selected');
+      selectedType = type;
+      console.log('Sample 8: Exam type selected —', type);
+    }
+
+    // Sample 7 + 10: Multiple params + Grade Checker — live grade badge
+    function updateGrade() {
+      let score = parseInt(document.getElementById('examScore').value);
+      let letter, bg;
+
+      // Sample 6: If-else chain
+      if      (isNaN(score))  { letter = '–'; bg = 'linear-gradient(135deg,#667eea,#764ba2)'; }
+      else if (score >= 90)   { letter = 'A'; bg = 'linear-gradient(135deg,#48bb78,#38a169)'; }
+      else if (score >= 80)   { letter = 'B'; bg = 'linear-gradient(135deg,#4299e1,#2b6cb0)'; }
+      else if (score >= 70)   { letter = 'C'; bg = 'linear-gradient(135deg,#ecc94b,#b7791f)'; }
+      else if (score >= 60)   { letter = 'D'; bg = 'linear-gradient(135deg,#f6ad55,#c05621)'; }
+      else                    { letter = 'F'; bg = 'linear-gradient(135deg,#fc8181,#c53030)'; }
+
+      // Sample 3: Change Text
+      document.getElementById('gradeLetter').textContent = letter;
+      document.getElementById('gradeBox').style.background = bg;
+      console.log('Sample 7+10: Score —', score, '| Grade —', letter);
+    }
+
+    // Sample 3: file name label
+    function showFileName(inputId, labelId) {
+      let file = document.getElementById(inputId).files[0];
+      if (file) { document.getElementById(labelId).textContent = '📎 ' + file.name; }
+    }
+
+    function previewProof(inputId, imgId, wrapId, labelId) {
+      let file = document.getElementById(inputId).files[0];
+      if (!file) return;
+      document.getElementById(labelId).textContent = '📎 ' + file.name;
+      let reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById(imgId).src = e.target.result;
+        document.getElementById(wrapId).style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Sample 1 + 6 + 10: Alert + If + Grade Checker
+    function uploadExam() {
+      let title = document.getElementById('examTitle').value.trim();
+      let score = document.getElementById('examScore').value;
+      let file  = document.getElementById('examFile').files[0];
+      let proof = document.getElementById('examProof').files[0];
+
+      // Sample 6: If-else validation
+      if (!title) { showToast('error', '❌ Please enter the exam title.'); return; }
+      if (!file)  { showToast('error', '❌ Please upload the exam file.'); return; }
+      if (!proof) { showToast('error', '❌ Proof image is required.'); return; }
+
+      // Sample 10: Grade checker
+      let grade = 'N/A';
+      if (score !== '') {
+        let s = parseInt(score);
+        grade = s >= 90 ? 'A' : s >= 80 ? 'B' : s >= 70 ? 'C' : s >= 60 ? 'D' : 'F';
+      }
+
+      // Sample 4: increment
+      examCount++;
+      localStorage.setItem('portfolio_examCount', examCount);
+      document.getElementById('examCounter').textContent = examCount;
+
+      let item = { title: title, type: selectedType, score: score || 'N/A', grade: grade, file: file.name, date: new Date().toLocaleDateString() };
+      submissions.push(item);
+      localStorage.setItem('portfolio_examItems', JSON.stringify(submissions));
+
+      showToast('success', '✅ ' + selectedType + ' Exam "' + title + '" submitted! Score: ' + (score||'N/A') + ' (' + grade + ') | Total: ' + examCount);
+      resetForm();
+      renderHistory();
+      console.log('Sample 1+4+6+10: Exam —', title, '| Grade —', grade);
+    }
+
+    // Sample 9: Loop — render
+    function renderHistory() {
+      let list = document.getElementById('examHistory');
+      document.getElementById('emptyNote').style.display = submissions.length === 0 ? 'block' : 'none';
+      document.querySelectorAll('.sub-item').forEach(function (el) { el.remove(); });
+
+      for (let i = 0; i < submissions.length; i++) {
+        let s = submissions[i];
+        let item = document.createElement('div');
+        item.className = 'sub-item exam-item';
+        item.innerHTML =
+          '<div>' +
+            '<div class="sub-title">' + s.title + ' <small style="color:#a0aec0">(' + s.type + ')</small></div>' +
+            '<div class="sub-meta">Score: ' + s.score + ' · Grade: ' + s.grade + ' &nbsp;·&nbsp; 🗓 ' + s.date + '</div>' +
+          '</div>' +
+          '<span class="sub-badge exam-badge">' + s.type + '</span>';
+        list.appendChild(item);
+      }
+      console.log('Sample 9: Rendered', submissions.length, 'exam submissions');
+    }
+
+    function showToast(type, msg) {
+      let el = document.getElementById(type === 'success' ? 'successToast' : 'errorToast');
+      el.textContent = msg;
+      el.style.display = 'block';
+      setTimeout(function () { el.style.display = 'none'; }, 5000);
+    }
+
+    function resetForm() {
+      document.getElementById('examTitle').value = '';
+      document.getElementById('examScore').value = '';
+      document.getElementById('examFile').value  = '';
+      document.getElementById('examProof').value = '';
+      document.getElementById('examFileLabel').textContent  = '';
+      document.getElementById('examProofLabel').textContent = '';
+      document.getElementById('examProofWrap').style.display = 'none';
+      document.getElementById('gradeLetter').textContent = '–';
+      document.getElementById('gradeBox').style.background = 'linear-gradient(135deg,#667eea,#764ba2)';
+    }
+
+    document.querySelectorAll('.file-drop').forEach(function (drop) {
+      drop.addEventListener('dragover',  function (e) { e.preventDefault(); drop.classList.add('drag-over'); });
+      drop.addEventListener('dragleave', function ()  { drop.classList.remove('drag-over'); });
+      drop.addEventListener('drop',      function ()  { drop.classList.remove('drag-over'); });
+    });
+
+    console.log('📋 Exam Upload Loaded!');
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Portfolio - Justin Arge B. Enecillo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="menu">
+    <a href="index.html" class="active">🏠 Home</a>
+    <a href="dashboard.html">📊 Dashboard</a>
+    <a href="quiz.html">📝 Quiz</a>
+    <a href="lab.html">🧪 Lab Work</a>
+    <a href="exam.html">📋 Exam</a>
+  </nav>
+
+  <div class="home-wrapper">
+
+    <!-- Visit Counter Bar -->
+    <div class="visit-bar">
+      <span>👋 Welcome to my Portfolio!</span>
+      <span>Visited <strong id="visitDisplay">1</strong> time(s)
+        <button class="reset-btn" onclick="resetVisits()">🔄 Reset</button>
+      </span>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="main-card">
+
+      <!-- Top: Photo + Name -->
+      <div class="card-top">
+        <div class="circle-pic">
+          <img src="cvsu picture.jpg" alt="Justin Arge B. Enecillo" id="profileImg">
+        </div>
+        <h2 id="studentName">Justin Arge B. Enecillo</h2>
+        <div class="card-top-tags">
+          <span class="tag" id="courseTag">BSCS</span>
+          <span class="tag" id="sectionTag">Section 1A</span>
+          <span class="tag">1st Year</span>
+          <span class="tag">CvSU</span>
+        </div>
+      </div>
+
+      <!-- Info row -->
+      <div class="card-body">
+        <p><strong>Name:</strong> <span id="infoName">Justin Arge B. Enecillo</span></p>
+        <p><strong>Course:</strong> <span id="infoCourse">BSCS</span></p>
+        <p><strong>Section:</strong> <span id="infoSection">1A</span></p>
+        <p><strong>Languages:</strong> <span>Filipino &amp; English</span></p>
+        <p style="margin-top:0.6rem; color:#555; font-size:0.93rem; line-height:1.6;">
+          I'm currently a first year student. Willing to do new things and a passionate person.
+        </p>
+        <button class="edit-btn" onclick="editProfile()">✏️ Edit Profile</button>
+      </div>
+
+      <!-- Autobiography -->
+      <div class="card-section">
+        <div class="section-label">📖 Autobiography</div>
+        <p id="autoText">
+          I'm Justin Arge B. Enecillo living in Dasmariñas City, Cavite. My mission is to work hard towards my goals, embodying integrity and perseverance and self-discipline and prioritize meaningful relationships. Embrace my strengths by engaging in activities that encourage creativity, such as art, writing, or brainstorming sessions. To overcome my weakness, consider joining clubs, attending social events, or volunteering, where I can meet new people with similar interests.
+        </p>
+      </div>
+
+      <!-- Vision -->
+      <div class="card-section">
+        <div class="section-label">🌟 Vision</div>
+        <p id="visionText">My ideal self is to be the best version of myself — a skilled developer who contributes positively to society through technology and continuous learning.</p>
+      </div>
+
+      <!-- Mission -->
+      <div class="card-section">
+        <div class="section-label">🚀 Mission</div>
+        <p id="missionText">To work hard towards my goals with integrity, perseverance, and self-discipline. Learn continuously, build meaningful projects, and grow as a computer scientist.</p>
+      </div>
+
+    </div><!-- /main-card -->
+
+    <!-- Skills Section -->
+    <div class="skills-section">
+      <div class="section-header">
+        <h2>💡 My Skills &nbsp;<span id="skillCount" style="font-size:0.9rem;color:#667eea;">(3)</span></h2>
+        <button class="add-btn" onclick="addSkill()" title="Add skill">➕</button>
+      </div>
+      <ul class="skills-list" id="skillsList">
+        <li onclick="highlightSkill(this)">🌐 HTML &amp; CSS</li>
+        <li onclick="highlightSkill(this)">🐍 Python Programming</li>
+        <li onclick="highlightSkill(this)">⚡ JavaScript</li>
+      </ul>
+    </div>
+
+    <!-- Projects Section -->
+    <div class="projects-section">
+      <div class="section-header">
+        <h2>🛠️ My Projects &nbsp;<span id="projectCount" style="font-size:0.9rem;color:#667eea;">(2)</span></h2>
+        <button class="add-btn" onclick="addProject()" title="Add project">➕</button>
+      </div>
+
+      <div id="projectsList">
+        <div class="project-card" onclick="toggleProject(this)">
+          <h3>Portfolio Website</h3>
+          <p>Personal portfolio with JavaScript features — skills, projects, visit counter.</p>
+          <span class="project-status">Active</span>
+        </div>
+        <div class="project-card" onclick="toggleProject(this)">
+          <h3>Calculator App</h3>
+          <p>Made with HTML, CSS, JavaScript. Includes basic arithmetic operations.</p>
+          <span class="project-status">Active</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /home-wrapper -->
+
+  <script>
+    // =============================================
+    // HOME PAGE JAVASCRIPT
+    // =============================================
+
+    // Sample 4: Counter — Visit Count
+    let visitCount = parseInt(localStorage.getItem('portfolio_visits') || '0') + 1;
+    localStorage.setItem('portfolio_visits', visitCount);
+    document.getElementById('visitDisplay').textContent = visitCount;
+
+    function resetVisits() {
+      visitCount = 1;
+      localStorage.setItem('portfolio_visits', visitCount);
+      document.getElementById('visitDisplay').textContent = visitCount;
+      alert('🔄 Visit counter has been reset!');
+    }
+
+    // Sample 1 + 3: Alert + Change Text — Edit Profile
+    function editProfile() {
+      let newName    = prompt('Enter your full name:', document.getElementById('infoName').textContent);
+      let newCourse  = prompt('Enter your course:', document.getElementById('infoCourse').textContent);
+      let newSection = prompt('Enter your section:', document.getElementById('infoSection').textContent);
+
+      // Sample 6: If statement
+      if (newName && newCourse && newSection) {
+        document.getElementById('studentName').textContent = newName;
+        document.getElementById('infoName').textContent    = newName;
+        document.getElementById('infoCourse').textContent  = newCourse;
+        document.getElementById('infoSection').textContent = newSection;
+        document.getElementById('courseTag').textContent   = newCourse;
+        document.getElementById('sectionTag').textContent  = 'Section ' + newSection;
+        alert('✅ Profile updated!\n' + newName + ' — ' + newCourse + ' ' + newSection);
+        console.log('Sample 1+3: Profile edited —', newName);
+      } else {
+        alert('❌ Update cancelled. Please fill all fields.');
+      }
+    }
+
+    // Sample 4 + 3: Counter + Change Text — Add Skill
+    let skillCount = 3;
+    function addSkill() {
+      let newSkill = prompt('Enter a new skill:');
+      if (newSkill && newSkill.trim()) {
+        skillCount++;
+        let li = document.createElement('li');
+        li.textContent = newSkill.trim();
+        li.onclick = function () { highlightSkill(this); };
+        document.getElementById('skillsList').appendChild(li);
+        document.getElementById('skillCount').textContent = '(' + skillCount + ')';
+        console.log('Sample 4: Skill added —', newSkill);
+      }
+    }
+
+    // Sample 8: Toggle — Highlight Skill
+    function highlightSkill(el) {
+      document.querySelectorAll('#skillsList li').forEach(function (li) {
+        li.classList.remove('highlighted');
+      });
+      el.classList.add('highlighted');
+      console.log('Sample 8: Highlighted —', el.textContent);
+    }
+
+    // Sample 8 + 6: Toggle — Project Status
+    function toggleProject(card) {
+      let status = card.querySelector('.project-status');
+      if (status.textContent === 'Active') {
+        status.textContent = 'Inactive';
+        status.classList.add('inactive');
+      } else {
+        status.textContent = 'Active';
+        status.classList.remove('inactive');
+      }
+      console.log('Sample 8: Project toggled —', card.querySelector('h3').textContent);
+    }
+
+    // Sample 4: Counter — Add Project
+    let projectCount = 2;
+    function addProject() {
+      let name = prompt('Project name:');
+      let desc = prompt('Short description:');
+      if (name && desc) {
+        projectCount++;
+        document.getElementById('projectCount').textContent = '(' + projectCount + ')';
+        let card = document.createElement('div');
+        card.className = 'project-card';
+        card.onclick = function () { toggleProject(this); };
+        card.innerHTML = '<h3>' + name + '</h3><p>' + desc + '</p><span class="project-status">Active</span>';
+        document.getElementById('projectsList').appendChild(card);
+        console.log('Sample 4: Project added —', name);
+      }
+    }
+
+    // Sample 10: Console summary
+    console.log('%c🎓 Justin Enecillo Portfolio Loaded!', 'color:#667eea;font-size:14px;font-weight:bold;');
+    console.log('Visits:', visitCount, '| Skills:', skillCount, '| Projects:', projectCount);
+  </script>
+
+</body>
+</html>
